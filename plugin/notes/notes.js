@@ -20,7 +20,8 @@ var RevealNotes = (function() {
 	document.addEventListener( 'keydown', function( event ) {
 		// Disregard the event if the target is editable or a
 		// modifier is present
-		if ( document.querySelector( ':focus' ) !== null || event.shiftKey || event.altKey || event.ctrlKey || event.metaKey ) return;
+		if ( document.querySelector( '.reveal .slides section :focus' ) !== null
+				|| event.shiftKey || event.altKey || event.ctrlKey || event.metaKey ) return;
 
 		if( event.keyCode === 83 ) {
 			event.preventDefault();
@@ -32,7 +33,7 @@ var RevealNotes = (function() {
 })();
 
 /**
- * Patch Reveal's configure() method to add 
+ * Patch Reveal's configure() method to add
  * option 'peekNextFragments: display all upcoming Fragments
  */
 (function() {
@@ -57,7 +58,7 @@ var RevealNotes = (function() {
 		walkFragmentClasses(function(fragment, className) {
 			fragment.classList.remove(className);
 			fragment.classList.add("_" + className);
-		});	
+		});
 	}
 
 	function peekFragmentsOff() {
@@ -92,7 +93,6 @@ var RevealNotes = (function() {
 /**
  * A Plugin to assign a time to each slide
  * Include data-timer="[+-]MMM:SS" in sections
- * 
  */
 // TODO config.dependencies (reveal.js l. 228)
 (function() {
