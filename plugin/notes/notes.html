@@ -147,8 +147,6 @@
 
     <body>
         <script>
-            // Workarounds for ugly situations
-
             // This window cannot be opened standalone
             if (typeof window.opener === 'undefined') {
                 window.close();
@@ -176,12 +174,12 @@
 
         <div class="time">
             <div class="clock">
-                <h2>Clock</h2>
+                <h2>Time</h2>
                 <span id="clock">0:00:00 AM</span>
             </div>
             <div class="elapsed">
-                <h2>Presentation Timer</h2>
-                <span id="sign"></span><span id="hours">00:</span><span id="minutes">00:</span><span id="seconds">00</span>
+                <h2>Elapsed</h2>
+                <span id="hours">00</span><span id="minutes">:00</span><span id="seconds">:00</span>
             </div>
         </div>
 
@@ -358,36 +356,31 @@
                 }
 
                 function initTimer() {
-                    // display timer if Reveal.Timer is enabled
-                    (function() {
-                        var timeEl = document.querySelector('.time'),
-                            elapsedEl = document.querySelector('.elapsed'),
-                            clockEl = document.getElementById('clock'),
-                            signEl =  document.getElementById('sign'),
-                            hoursEl = document.getElementById('hours'),
-                            minutesEl = document.getElementById('minutes'),
-                            secondsEl = document.getElementById('seconds');
+                    var start = new Date(),
+                        timeEl = document.querySelector( '.time' ),
+                        clockEl = document.getElementById( 'clock' ),
+                        hoursEl = document.getElementById( 'hours' ),
+                        minutesEl = document.getElementById( 'minutes' ),
+                        secondsEl = document.getElementById( 'seconds' );
 
-                        setInterval(function() {
-                            timeEl.style.opacity = 1;
-                            clockEl.innerHTML = (new Date()).toLocaleTimeString();
-                            if(master.Reveal.Timer) {
-                                var sign = Math.sign(master.Reveal.Timer.getTime()),
-                                    t = Math.abs(master.Reveal.Timer.getTime()),
-                                    h = Math.floor(t / (60 * 60)),
-                                    m = Math.floor((t / 60) % 60),
-                                    s = Math.floor(t % 60);
+                    setInterval( function() {
+                        timeEl.style.opacity = 1;
+                        var diff, hours, minutes, seconds,
+                            now = new Date();
 
-                                signEl.innerHTML = sign > 0 ? "" : "-";
-                                hoursEl.innerHTML = ("00" + h).slice(-2) + ":";
-                                hoursEl.className = h !== 0 ? "" : "mute";
-                                minutesEl.innerHTML = ("00" + m).slice(-2) + ":";
-                                secondsEl.innerHTML = ("00" + s).slice(-2);
-                            } else {
-                                elapsedEl.style.display = "none";
-                            }
-                        }, 1000);
-                    })();
+			diff = now.getTime() - start.getTime();
+                        hours = Math.floor( diff / ( 1000 * 60 * 60 ) );
+                        minutes = Math.floor( ( diff / ( 1000 * 60 ) ) % 60 );
+                        seconds = Math.floor( ( diff / 1000 ) % 60 );
+
+                        clockEl.innerHTML = now.toLocaleTimeString();
+                        hoursEl.innerHTML = zeroPadInteger( hours );
+                        hoursEl.className = hours > 0 ? "" : "mute";
+                        minutesEl.innerHTML = ":" + zeroPadInteger( minutes );
+                        minutesEl.className = minutes > 0 ? "" : "mute";
+                        secondsEl.innerHTML = ":" + zeroPadInteger( seconds );
+
+                    }, 1000 );
                 }
 
                 function initialize() {
