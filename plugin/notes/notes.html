@@ -120,6 +120,7 @@
             }
 
             .elapsed,
+            .timer,
             .clock {
                 color: #333;
                 font-size: 2em;
@@ -131,6 +132,7 @@
             }
 
             .elapsed h2,
+            .timer h2,
             .clock h2 {
                 font-size: 0.8em;
                 line-height: 100%;
@@ -138,7 +140,7 @@
                 color: #aaa;
             }
 
-            .elapsed .mute {
+            .elapsed .mute, .timer .mute {
                 display: none;
             }
 
@@ -147,8 +149,6 @@
 
     <body>
         <script>
-            // Workarounds for ugly situations
-
             // This window cannot be opened standalone
             if (typeof window.opener === 'undefined') {
                 window.close();
@@ -179,9 +179,13 @@
                 <h2>Clock</h2>
                 <span id="clock">0:00:00 AM</span>
             </div>
-            <div class="elapsed">
+            <div class="timer">
                 <h2>Presentation Timer</h2>
-                <span id="sign"></span><span id="hours">00:</span><span id="minutes">00:</span><span id="seconds">00</span>
+                <span class="sign"></span><span class="hours">00:</span><span class="minutes">00:</span><span class="seconds">00</span>
+            </div>
+            <div class="elapsed">
+                <h2>Elapsed Time</h2>
+                <span class="hours">00:</span><span class="minutes">00:</span><span class="seconds">00</span>
             </div>
         </div>
 
@@ -362,29 +366,53 @@
                     (function() {
                         var timeEl = document.querySelector('.time'),
                             elapsedEl = document.querySelector('.elapsed'),
-                            clockEl = document.getElementById('clock'),
-                            signEl =  document.getElementById('sign'),
-                            hoursEl = document.getElementById('hours'),
-                            minutesEl = document.getElementById('minutes'),
-                            secondsEl = document.getElementById('seconds');
+                            clockEl = document.querySelector('#clock'),
+                            timerEl = document.querySelector('.timer'),
+                            elapsed = {
+                                hoursEl: document.querySelector('.elapsed .hours'),
+                                minutesEl: document.querySelector('.elapsed .minutes'),
+                                secondsEl: document.querySelector('.elapsed .seconds')
+                            },
+                            timer = {
+                                signEl: document.querySelector('.timer .sign'),
+                                hoursEl: document.querySelector('.timer .hours'),
+                                minutesEl: document.querySelector('.timer .minutes'),
+                                secondsEl: document.querySelector('.timer .seconds')
+                            },
+                            start = new Date();
 
                         setInterval(function() {
+                            var sign, t, h, m, s;
                             timeEl.style.opacity = 1;
                             clockEl.innerHTML = (new Date()).toLocaleTimeString();
                             if(master.Reveal.Timer) {
-                                var sign = Math.sign(master.Reveal.Timer.getTime()),
-                                    t = Math.abs(master.Reveal.Timer.getTime()),
-                                    h = Math.floor(t / (60 * 60)),
-                                    m = Math.floor((t / 60) % 60),
-                                    s = Math.floor(t % 60);
+                                sign = Math.sign(master.Reveal.Timer.getTime());
+                                t = Math.abs(master.Reveal.Timer.getTime());
+                                h = Math.floor(t / (60 * 60));
+                                m = Math.floor((t / 60) % 60);
+                                s = Math.floor(t % 60);
 
-                                signEl.innerHTML = sign > 0 ? "" : "-";
-                                hoursEl.innerHTML = ("00" + h).slice(-2) + ":";
-                                hoursEl.className = h !== 0 ? "" : "mute";
-                                minutesEl.innerHTML = ("00" + m).slice(-2) + ":";
-                                secondsEl.innerHTML = ("00" + s).slice(-2);
-                            } else {
+                                timer.signEl.innerHTML = sign > 0 ? "" : "-";
+                                timer.hoursEl.innerHTML = ("00" + h).slice(-2) + ":";
+                                timer.hoursEl.className = h !== 0 ? "" : "mute";
+                                timer.minutesEl.innerHTML = ("00" + m).slice(-2) + ":";
+                                timer.secondsEl.innerHTML = ("00" + s).slice(-2);
+
+                                timerEl.style.display = "";
                                 elapsedEl.style.display = "none";
+                            } else {
+                                t = new Date().getTime() - start.getTime();
+                                h = Math.floor(t / (1000 * 60 * 60));
+                                m = Math.floor((t / (1000 * 60)) % 60);
+                                s = Math.floor((t / 1000) % 60);
+
+                                elapsed.hoursEl.innerHTML = ("00" + h).slice(-2) + ":";
+                                elapsed.hoursEl.className = h !== 0 ? "" : "mute";
+                                elapsed.minutesEl.innerHTML = ("00" + m).slice(-2) + ":";
+                                elapsed.secondsEl.innerHTML = ("00" + s).slice(-2);
+
+                                timerEl.style.display = "none";
+                                elapsedEl.style.display = "";
                             }
                         }, 1000);
                     })();
