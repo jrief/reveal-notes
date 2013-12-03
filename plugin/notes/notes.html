@@ -22,6 +22,7 @@
                 width: 640px;
                 height: 512px;
                 float: left;
+                margin: 5px;
                 overflow: hidden;
 
                 border: 1px solid black;
@@ -49,7 +50,7 @@
                 width: 448px;
                 height: 358px;
                 float: left;
-                margin: 0 0 0 10px;
+                margin: 5px;
                 overflow: hidden;
 
                 border: 1px solid black;
@@ -193,8 +194,30 @@
 
         <script src="../../plugin/markdown/marked.js"></script>
         <script>
+            (function() {
+                "use strict";
+                var wrapCurrent = document.querySelector('#wrap-current-slide'),
+                    wrapUpcoming = document.querySelector('#wrap-next-slide'),
+                    current = document.querySelector('#current-slide'),
+                    upcoming = document.querySelector('#next-slide');
+                function resize(width, height) {
+                    width = Math.floor(width / 0.85 - 46);
+                    height = Math.floor(height / 0.85 - 46);
+                    current.style.width = width + "px";
+                    current.style.height = height + "px";
+                    wrapCurrent.style.width = Math.floor(width * 0.5) + "px";
+                    wrapCurrent.style.height = Math.floor(height * 0.5) + "px";
+                    upcoming.style.width = width + "px";
+                    upcoming.style.height = height + "px";
+                    wrapUpcoming.style.width = Math.floor(width * 0.35) + "px";
+                    wrapUpcoming.style.height = Math.floor(height * 0.35) + "px";
+                }
+                window.addEventListener('resize', function() { resize(window.innerWidth, window.innerHeight); }, false);
+                resize(window.innerWidth, window.innerHeight);
+            })();
+        </script>
 
-
+        <script>
             var waitFor = function(testFunctions, callbackFunction) {
                 var waitAndTest = function() {
                     var loaded = true;
@@ -368,54 +391,47 @@
                             elapsedEl = document.querySelector('.elapsed'),
                             clockEl = document.querySelector('#clock'),
                             timerEl = document.querySelector('.timer'),
-                            elapsed = {
-                                hoursEl: document.querySelector('.elapsed .hours'),
-                                minutesEl: document.querySelector('.elapsed .minutes'),
-                                secondsEl: document.querySelector('.elapsed .seconds')
-                            },
-                            timer = {
-                                signEl: document.querySelector('.timer .sign'),
-                                hoursEl: document.querySelector('.timer .hours'),
-                                minutesEl: document.querySelector('.timer .minutes'),
-                                secondsEl: document.querySelector('.timer .seconds')
-                            },
+                            updateTimer = updateTimerElement(timerEl),
+                            updateElapsed = updateTimerElement(elapsedEl),
                             start = new Date();
 
                         setInterval(function() {
-                            var sign, t, h, m, s;
                             timeEl.style.opacity = 1;
                             clockEl.innerHTML = (new Date()).toLocaleTimeString();
                             if(master.Reveal.Timer) {
-                                sign = Math.sign(master.Reveal.Timer.getTime());
-                                t = Math.abs(master.Reveal.Timer.getTime());
-                                h = Math.floor(t / (60 * 60));
-                                m = Math.floor((t / 60) % 60);
-                                s = Math.floor(t % 60);
-
-                                timer.signEl.innerHTML = sign > 0 ? "" : "-";
-                                timer.hoursEl.innerHTML = ("00" + h).slice(-2) + ":";
-                                timer.hoursEl.className = h !== 0 ? "" : "mute";
-                                timer.minutesEl.innerHTML = ("00" + m).slice(-2) + ":";
-                                timer.secondsEl.innerHTML = ("00" + s).slice(-2);
-
+                                updateTimer(master.Reveal.Timer.getTime());
                                 timerEl.style.display = "";
                                 elapsedEl.style.display = "none";
                             } else {
-                                t = new Date().getTime() - start.getTime();
-                                h = Math.floor(t / (1000 * 60 * 60));
-                                m = Math.floor((t / (1000 * 60)) % 60);
-                                s = Math.floor((t / 1000) % 60);
-
-                                elapsed.hoursEl.innerHTML = ("00" + h).slice(-2) + ":";
-                                elapsed.hoursEl.className = h !== 0 ? "" : "mute";
-                                elapsed.minutesEl.innerHTML = ("00" + m).slice(-2) + ":";
-                                elapsed.secondsEl.innerHTML = ("00" + s).slice(-2);
-
+                                updateElapsed((new Date().getTime() - start.getTime()) / 1000);
                                 timerEl.style.display = "none";
                                 elapsedEl.style.display = "";
                             }
                         }, 1000);
                     })();
+                }
+
+                function updateTimerElement(element) {
+                    var signEl, hoursEl, minutesEl, secondsEl;
+                    signEl = element.querySelector('.sign');
+                    hoursEl = element.querySelector('.hours');
+                    minutesEl = element.querySelector('.minutes');
+                    secondsEl = element.querySelector('.seconds');
+
+                    return function(delta) {
+                        var sign, h, m, s;
+                        sign = Math.sign(delta);
+                        delta = Math.abs(delta);
+                        h = Math.floor(delta / (60 * 60));
+                        m = Math.floor((delta / 60) % 60);
+                        s = Math.floor(delta % 60);
+
+                        if(signEl !== null) signEl.innerHTML = sign > 0 ? "" : "-";
+                        hoursEl.innerHTML = ("00" + h).slice(-2) + ":";
+                        hoursEl.className = h !== 0 ? "" : "mute";
+                        minutesEl.innerHTML = ("00" + m).slice(-2) + ":";
+                        secondsEl.innerHTML = ("00" + s).slice(-2);
+                    };
                 }
 
                 function initialize() {
