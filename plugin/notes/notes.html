@@ -22,6 +22,7 @@
                 width: 640px;
                 height: 512px;
                 float: left;
+                margin: 5px;
                 overflow: hidden;
 
                 border: 1px solid black;
@@ -49,7 +50,7 @@
                 width: 448px;
                 height: 358px;
                 float: left;
-                margin: 0 0 0 10px;
+                margin: 5px;
                 overflow: hidden;
 
                 border: 1px solid black;
@@ -187,8 +188,30 @@
 
         <script src="../../plugin/markdown/marked.js"></script>
         <script>
+            (function() {
+                "use strict";
+                var wrapCurrent = document.querySelector('#wrap-current-slide'),
+                    wrapUpcoming = document.querySelector('#wrap-next-slide'),
+                    current = document.querySelector('#current-slide'),
+                    upcoming = document.querySelector('#next-slide');
+                function resize(width, height) {
+                    width = Math.floor(width / 0.85 - 46);
+                    height = Math.floor(height / 0.85 - 46);
+                    current.style.width = width + "px";
+                    current.style.height = height + "px";
+                    wrapCurrent.style.width = Math.floor(width * 0.5) + "px";
+                    wrapCurrent.style.height = Math.floor(height * 0.5) + "px";
+                    upcoming.style.width = width + "px";
+                    upcoming.style.height = height + "px";
+                    wrapUpcoming.style.width = Math.floor(width * 0.35) + "px";
+                    wrapUpcoming.style.height = Math.floor(height * 0.35) + "px";
+                }
+                window.addEventListener('resize', function() { resize(window.innerWidth, window.innerHeight); }, false);
+                resize(window.innerWidth, window.innerHeight);
+            })();
+        </script>
 
-
+        <script>
             var waitFor = function(testFunctions, callbackFunction) {
                 var waitAndTest = function() {
                     var loaded = true;
