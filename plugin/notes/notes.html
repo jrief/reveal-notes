@@ -376,8 +376,6 @@
                 }
 
                 function addFocusEventListeners() {
-                    // Add "glow" effect to Iframes so we can see which frame is focussed
-                    // TODO check if this works in IE, see http://www.quirksmode.org/blog/archives/2008/04/delegating_the.html
                     current.onfocus = function() { document.getElementById('wrap-current-slide').classList.add("focus");    current.Reveal.configure({ controls: true }); };
                     current.onblur  = function() { document.getElementById('wrap-current-slide').classList.remove("focus"); current.Reveal.configure({ controls: false }); };
                     upcoming.onfocus = function() { document.getElementById('wrap-next-slide').classList.add("focus");    upcoming.Reveal.configure({ controls: true }); };
@@ -385,7 +383,6 @@
                 }
 
                 function initTimer() {
-                    // display timer if Reveal.Timer is enabled
                     (function() {
                         var timeEl = document.querySelector('.time'),
                             elapsedEl = document.querySelector('.elapsed'),
@@ -399,6 +396,7 @@
                             timeEl.style.opacity = 1;
                             clockEl.innerHTML = (new Date()).toLocaleTimeString();
                             if(master.Reveal.Timer) {
+                                // display timer if Reveal.Timer is enabled
                                 updateTimer(master.Reveal.Timer.getTime());
                                 timerEl.style.display = "";
                                 elapsedEl.style.display = "none";
@@ -442,9 +440,6 @@
                     current.Reveal.configure({ transition: 'none', controls: false, progress: false, peekFragments: true });
                     upcoming.Reveal.configure({ transition: 'none', controls: false, progress: false, peekFragments: true });
                     current.focus();
-
-                    // FIXME add event listeners again when master is reloaded
-                    // TODO create a SpeakerView object with control methods
                 }
 
                 function start() {

@@ -42,7 +42,7 @@ var RevealNotes = (function() {
 	var _configure = Reveal.configure;
 	var styleNode = document.createElement('style');
 
-	// the initial state of the fragment, just grayed out; only works nicely for default animation (opacity change)
+	// the initial state of the fragment, just grayed out
 	styleNode.innerHTML = ".reveal .slides section .fragment:not(.visible) { opacity: 0.33 !important; }";
 
 	Reveal.configure = function(options) {
@@ -53,6 +53,8 @@ var RevealNotes = (function() {
 	}
 	Reveal.configure({});
 
+	// resets to default fragment behavior by adding underscores
+	// to all class names except fragment, visible, current-fragment
 	function peekFragmentsOn() {
 		document.head.appendChild(styleNode);
 		walkFragmentClasses(function(fragment, className) {
